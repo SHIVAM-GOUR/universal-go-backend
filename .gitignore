@@ -3,10 +3,10 @@ bin/
 tmp/
 
 # ── Environment / secrets ─────────────────────────────────────────────────────
-.envrc
-.env
-.env.local
-.env.*.local
+# .envrc
+# .env
+# .env.local
+# .env.*.local
 
 # ── Air live-reload ───────────────────────────────────────────────────────────
 build-errors.log
