@@ -1,0 +1,157 @@
+basePath: /
+definitions:
+  domain.ArticleResponse:
+    properties:
+      author:
+        type: string
+      body:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.CreateArticleRequest:
+    properties:
+      author:
+        maxLength: 100
+        minLength: 2
+        type: string
+      body:
+        minLength: 10
+        type: string
+      title:
+        maxLength: 255
+        minLength: 3
+        type: string
+    required:
+    - author
+    - body
+    - title
+    type: object
+  domain.ErrorResponse:
+    properties:
+      code:
+        example: INTERNAL_ERROR
+        type: string
+      error:
+        example: something went wrong
+        type: string
+    type: object
+  domain.HealthResponse:
+    properties:
+      env:
+        example: development
+        type: string
+      status:
+        example: ok
+        type: string
+      timestamp:
+        example: "2024-01-01T00:00:00Z"
+        type: string
+      version:
+        example: 1.0.0
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Production-ready Go backend template.
+  title: Universal Go Backend
+  version: "1.0"
+paths:
+  /api/v1/articles:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new article using a DB transaction
+      parameters:
+      - description: Article payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateArticleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.ArticleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Create an article
+      tags:
+      - articles
+  /api/v1/articles/{id}:
+    get:
+      description: Retrieves a single article by UUID
+      parameters:
+      - description: Article UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ArticleResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Get an article
+      tags:
+      - articles
+  /health/live:
+    get:
+      description: Returns 200 if the server process is running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.HealthResponse'
+      summary: Liveness check
+      tags:
+      - health
+  /health/ready:
+    get:
+      description: Returns 200 if server and DB are both reachable
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.HealthResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Readiness check
+      tags:
+      - health
+schemes:
+- http
+- https
+swagger: "2.0"
