@@ -16,13 +16,11 @@ import (
 	"syscall"
 
 	_ "my-app/docs"
+	"my-app/internal/app"
 	"my-app/internal/config"
 	"my-app/internal/db"
-	"my-app/internal/handler"
-	"my-app/internal/repository"
 	"my-app/internal/routes"
 	"my-app/internal/server"
-	"my-app/internal/service"
 )
 
 func main() {
@@ -36,14 +34,8 @@ func main() {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	// Wire up layers.
-	articleRepo := repository.NewArticleRepository(pool)
-	articleSvc := service.NewArticleService(articleRepo)
-	articleHandler := handler.NewArticleHandler(articleSvc)
-	healthHandler := handler.NewHealthHandler(cfg, pool)
-
-	// Build router and server.
-	r := routes.New(cfg, healthHandler, articleHandler)
+	a := app.New(cfg, pool)
+	r := routes.New(cfg, a)
 	srv := server.New(cfg, r)
 
 	// Start server in background goroutine.

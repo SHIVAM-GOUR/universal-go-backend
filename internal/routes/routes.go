@@ -10,37 +10,41 @@ import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	httpSwagger "github.com/swaggo/http-swagger"
 
+	"my-app/internal/app"
 	"my-app/internal/config"
-	"my-app/internal/handler"
 	"my-app/internal/middleware"
 )
 
 // New builds and returns the fully configured chi router.
-func New(cfg *config.Config, healthHandler *handler.HealthHandler, articleHandler *handler.ArticleHandler) http.Handler {
+// Add new route groups here when you introduce a new feature.
+func New(cfg *config.Config, a *app.App) http.Handler {
 	r := chi.NewRouter()
 
 	// ── Global middleware (applied to every request) ──────────────────────────
-	r.Use(chimiddleware.RequestID)   // injects X-Request-ID header
-	r.Use(chimiddleware.RealIP)      // reads X-Forwarded-For / X-Real-IP
-	r.Use(chimiddleware.Recoverer)   // catches panics, returns 500
-	r.Use(middleware.CORS(cfg))      // cross-origin headers
-	r.Use(chimiddleware.Timeout(30 * time.Second)) // per-request deadline
+	r.Use(chimiddleware.RequestID)
+	r.Use(chimiddleware.RealIP)
+	r.Use(chimiddleware.Recoverer)
+	r.Use(middleware.CORS(cfg))
+	r.Use(chimiddleware.Timeout(30 * time.Second))
 
 	// ── Swagger UI ─────────────────────────────────────────────────────────────
-	// Access at: GET /swagger/index.html
 	r.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 
-	// ── Health endpoints ───────────────────────────────────────────────────────
-	r.Get("/health/live", healthHandler.Live)
-	r.Get("/health/ready", healthHandler.Ready)
+	// ── Health ─────────────────────────────────────────────────────────────────
+	r.Get("/health/live", a.HealthHandler.Live)
+	r.Get("/health/ready", a.HealthHandler.Ready)
 
 	// ── API v1 ─────────────────────────────────────────────────────────────────
 	r.Route("/api/v1", func(r chi.Router) {
 		// Articles
-		r.Post("/articles", articleHandler.CreateArticle)
-		r.Get("/articles/{id}", articleHandler.GetArticleByID)
+		r.Post("/articles", a.ArticleHandler.CreateArticle)
+		r.Get("/articles/{id}", a.ArticleHandler.GetArticleByID)
+
+		// Add new resource groups here:
+		// r.Post("/users",      a.UserHandler.CreateUser)
+		// r.Get("/users/{id}",  a.UserHandler.GetUserByID)
 	})
 
 	return r
