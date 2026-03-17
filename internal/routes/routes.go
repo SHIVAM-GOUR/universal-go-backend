@@ -41,6 +41,7 @@ func New(cfg *config.Config, a *app.App) http.Handler {
 		// Articles
 		r.Post("/articles", a.ArticleHandler.CreateArticle)
 		r.Get("/articles/{id}", a.ArticleHandler.GetArticleByID)
+		r.Put("/articles/{id}", a.ArticleHandler.UpdateArticle)
 
 		// Add new resource groups here:
 		// r.Post("/users",      a.UserHandler.CreateUser)

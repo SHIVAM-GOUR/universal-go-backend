@@ -31,3 +31,11 @@ func (s *ArticleService) CreateArticle(ctx context.Context, req domain.CreateArt
 func (s *ArticleService) GetArticleByID(ctx context.Context, id string) (domain.ArticleResponse, error) {
 	return s.repo.GetArticleByID(ctx, id)
 }
+
+func (s *ArticleService) ListArticle(ctx context.Context, id string, req domain.UpdateArticleRequest) (domain.ArticleResponse, error) {
+	return s.repo.UpdateArticle(ctx, id, req)
+}
+
+func (s *ArticleService) UpdateArticle(ctx context.Context, id string, req domain.UpdateArticleRequest) (domain.ArticleResponse, error) {
+	return s.repo.UpdateArticle(ctx, id, req)
+}

@@ -84,3 +84,41 @@ func (h *ArticleHandler) GetArticleByID(w http.ResponseWriter, r *http.Request) 
 
 	writeJSON(w, http.StatusOK, resp)
 }
+
+// UpdateArticle godoc
+//
+//	@Summary                Update an article
+//	@Tags                   articles
+//	@Accept                 json
+//	@Produce                json
+//	@Param                  id              path            string                                          true    "Article UUID"
+//	@Param                  request body            domain.UpdateArticleRequest     true    "Update payload"
+//	@Success                200             {object}        domain.ArticleResponse
+//	@Failure                400             {object}        domain.ErrorResponse
+//	@Failure                404             {object}        domain.ErrorResponse
+//	@Router                 /api/v1/articles/{id} [put]
+func (h *ArticleHandler) UpdateArticle(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	var req domain.UpdateArticleRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid request body", "INVALID BODY")
+		return
+	}
+
+	if err := validate.Struct(req); err != nil {
+		writeValidationError(w, err)
+		return
+	}
+
+	resp, err := h.svc.UpdateArticle(r.Context(), id, req)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			writeError(w, http.StatusNotFound, "article not found", "NOT FOUND")
+			return
+		}
+		writeError(w, http.StatusInternalServerError, "failed to update article", "INTERNAL_ERROR")
+		return
+	}
+	writeJSON(w, http.StatusOK, resp)
+}

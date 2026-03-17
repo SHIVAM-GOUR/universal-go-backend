@@ -24,3 +24,8 @@ type ErrorResponse struct {
 	Error string `json:"error" example:"something went wrong"`
 	Code  string `json:"code"  example:"INTERNAL_ERROR"`
 }
+
+type UpdateArticleRequest struct {
+	Title string `json:"title" validate:"required,min=3,max=255"`
+	Body  string `json:"body" validate:"required,min=10"`
+}

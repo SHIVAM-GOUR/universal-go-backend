@@ -99,3 +99,26 @@ func toArticleResponse(a generated.Article) domain.ArticleResponse {
 		UpdatedAt: a.UpdatedAt.Time,
 	}
 }
+
+func (r *ArticleRepository) UpdateArticle(ctx context.Context, id string, req domain.UpdateArticleRequest) (domain.ArticleResponse, error) {
+	q := generated.New(r.pool)
+
+	var pgID pgtype.UUID
+	if err := pgID.Scan(id); err != nil {
+		return domain.ArticleResponse{}, pkgerrors.Wrap(domain.ErrNotFound, "invalid article uuid")
+	}
+
+	article, err := q.UpdateArticle(ctx, generated.UpdateArticleParams{
+		ID:    pgID,
+		Title: req.Title,
+		Body:  req.Body,
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.ArticleResponse{}, pkgerrors.Wrap(domain.ErrNotFound, "update article")
+		}
+		return domain.ArticleResponse{}, pkgerrors.Wrap(err, "update article")
+	}
+
+	return toArticleResponse(article), nil
+}

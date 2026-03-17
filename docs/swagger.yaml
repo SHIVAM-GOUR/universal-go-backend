@@ -57,6 +57,19 @@ definitions:
         example: 1.0.0
         type: string
     type: object
+  domain.UpdateArticleRequest:
+    properties:
+      body:
+        minLength: 10
+        type: string
+      title:
+        maxLength: 255
+        minLength: 3
+        type: string
+    required:
+    - body
+    - title
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -119,6 +132,39 @@ paths:
           schema:
             $ref: '#/definitions/domain.ErrorResponse'
       summary: Get an article
+      tags:
+      - articles
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Article UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateArticleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ArticleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Update an article
       tags:
       - articles
   /health/live:

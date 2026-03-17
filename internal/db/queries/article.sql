@@ -10,3 +10,9 @@ WHERE id = $1;
 -- name: ListArticles :many
 SELECT * FROM articles
 ORDER BY created_at DESC;
+
+-- name: UpdateArticle :one
+UPDATE articles
+SET title = $2, body = $3, updated_at = now()
+WHERE id = $1
+RETURNING *;
