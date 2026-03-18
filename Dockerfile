@@ -2,7 +2,7 @@
 # Stage 1: Builder
 # Generates Swagger docs then compiles a statically linked binary.
 # ─────────────────────────────────────────────────────────────────────────────
-FROM golang:1.23-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
