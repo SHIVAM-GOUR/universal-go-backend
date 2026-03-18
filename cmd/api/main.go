@@ -34,6 +34,10 @@ func main() {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
+	if err := db.RunMigrations(pool, cfg); err != nil {
+		log.Fatalf("failed to run migrations: %v", err)
+	}
+
 	a := app.New(cfg, pool)
 	r := routes.New(cfg, a)
 	srv := server.New(cfg, r)
